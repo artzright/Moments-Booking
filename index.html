@@ -314,119 +314,27 @@ svg{flex-shrink:0}
 <script>
 'use strict';
 /* ================= STATE ================= */
-const KEY='shaadios-v2';
+const KEY='shaadios-v3';
 const DEFAULT={
 theme:'light',
-agency:{name:'Artzright Films & Photography',short:'Artzright',owner:'',tagline:'Wedding Films & Photography',phone:'919800000000',email:'hello@artzright.com',address:'Mumbai, India',upi:'artzright@upi',logo:null,sheetsUrl:''},
+agency:{name:'Your Agency Name',short:'Agency',owner:'',tagline:'Wedding Films & Photography',phone:'',email:'',address:'',upi:'',logo:null,sheetsUrl:''},
 users:[
- {id:'u1',name:'Vikas Upadhyay',role:'Super Admin',pin:'1234'},
- {id:'u2',name:'Kavya Pillai',role:'Manager',pin:'1111'},
- {id:'u3',name:'Tanya Bose',role:'Sales',pin:'5555'},
- {id:'u4',name:'Mehul Shah',role:'Accountant',pin:'6666'},
- {id:'u5',name:'Arjun Rathod',role:'Photographer',pin:'2222'},
- {id:'u6',name:'Rohit Nair',role:'Editor',pin:'3333'},
- {id:'u7',name:'Imran Qureshi',role:'Freelancer',pin:'4444'},
- {id:'u8',name:'Ananya & Rohan',role:'Client',pin:'0000',projId:'p1'}
+ {id:'u1',name:'Admin',role:'Super Admin',pin:'1234'}
 ],
-projects:[
- {id:'p1',bride:'Ananya Singhania',groom:'Rohan Malhotra',phone:'919820011223',email:'ananya@gmail.com',city:'Udaipur',venue:'The Oberoi Udaivilas',dates:'14–16 Nov 2026',status:'Editing',pkg:250000,stage:5,
-  payments:[{label:'Advance',amount:100000,date:'12 Aug 2026',paid:true},{label:'2nd Installment',amount:50000,date:'10 Nov 2026',paid:true},{label:'Final Payment',amount:100000,date:'On delivery',paid:false}],
-  expenses:[{e:'✈️',label:'Travel — flights ×6',amount:48000,cat:'Travel'},{e:'🏨',label:'Hotel — 3 nights ×3 rooms',amount:36000,cat:'Travel'},{e:'🍱',label:'Food & local travel',amount:11500,cat:'Travel'},{e:'🎥',label:'Freelancers — Imran, Sara',amount:42000,cat:'Freelancers'},{e:'🔧',label:'Gimbal + lights rental',amount:18000,cat:'Equipment'}],
-  events:[{name:'💛 Haldi',date:'2026-11-14',time:'10:00 AM',report:'8:30 AM',venue:'Jagmandir Island',shot:true},{name:'💚 Mehendi + Sangeet',date:'2026-11-15',time:'4:00 PM – 1:00 AM',report:'2:30 PM',venue:'City Palace Lawns',shot:true},{name:'❤️ Wedding + Reception',date:'2026-11-16',time:'7:00 PM',report:'4:00 PM',venue:'The Oberoi Udaivilas',shot:true}],
-  team:[{name:'Arjun Rathod',role:'Lead Photographer',note:'All events',status:'Confirmed'},{name:'Kunal Shah',role:'Cinematographer',note:'All events',status:'Confirmed'},{name:'Imran Qureshi',role:'Drone Op (freelance)',note:'Wedding day · ₹15,000/day',status:'Payment due'},{name:'Rohit Nair',role:'Editor',note:'Highlight + Full film',status:'Editing'}],
-  checkins:[{label:'Reached venue',time:'3:48 PM'},{label:'Shoot started',time:'6:55 PM'},{label:'Shoot completed',time:null}],
-  cards:[{name:'Sony Tough 128GB — #C04',detail:'Haldi + Mehendi · 96 GB',status:'Offloaded'},{name:'Sandisk Extreme 256GB — #C11',detail:'Wedding photos · 210 GB',status:'Offloaded'},{name:'CFexpress 512GB — #C02',detail:'Cinema footage · 480 GB',status:'Offloaded'}],
-  logs:[{by:'Arjun R.',detail:'18 Nov · 11:20 PM → 2:05 AM · checksum passed'},{by:'Kavya (PM)',detail:'19 Nov · 10:00 AM · verified bit-by-bit'}],raw:'1.82 TB',
-  deliverables:[{e:'📸',name:'Edited Photos (600)',detail:'pixieset · 26 Nov',status:'Delivered'},{e:'🎞️',name:'Teaser (60s)',detail:'2 revisions',status:'Delivered'},{e:'✨',name:'Highlight Film (4–6 min)',detail:'ETA 19 Jun',status:'In progress'},{e:'🎬',name:'Full Film (45 min)',detail:'Queued after highlight',status:'Pending'},{e:'📱',name:'Reels ×3',detail:'1 of 3 delivered',status:'In progress'},{e:'📖',name:'Premium Album (40 sheets)',detail:'Awaiting client selects',status:'Waiting client'}]},
- {id:'p2',bride:'Diya Sharma',groom:'Aman Kapoor',phone:'919930044556',email:'diya.s@gmail.com',city:'Mumbai',venue:'Taj Lands End',dates:'21–23 Jun 2026',status:'Upcoming',pkg:420000,stage:1,
-  payments:[{label:'Advance',amount:150000,date:'02 Apr 2026',paid:true},{label:'2nd Installment',amount:100000,date:'08 Jun 2026',paid:false,overdue:true},{label:'Final Payment',amount:170000,date:'On delivery',paid:false}],
-  expenses:[{e:'🎥',label:'Freelancers booked — Sara, Dev',amount:56000,cat:'Freelancers'}],
-  events:[{name:'💛 Haldi',date:'2026-06-21',time:'9:00 AM',report:'7:00 AM',venue:'Taj Lands End Poolside',shot:false},{name:'💃 Sangeet',date:'2026-06-22',time:'7:00 PM',report:'4:00 PM',venue:'Grand Ballroom',shot:false},{name:'❤️ Wedding',date:'2026-06-23',time:'8:00 PM',report:'5:00 PM',venue:'Sea Lawn',shot:false}],
-  team:[{name:'Priya Menon',role:'Photographer',note:'All events',status:'Confirmed'},{name:'Neha Tiwari',role:'Photographer',note:'All events',status:'Confirmed'},{name:'Kunal Shah',role:'Cinematographer',note:'All events',status:'Confirmed'},{name:'Sara Fernandes',role:'2nd Photographer (freelance)',note:'₹8,000/day',status:'Confirmed'},{name:'Dev Kohli',role:'Gimbal Op (freelance)',note:'₹10,000/day',status:'Confirmed'}],
-  checkins:[{label:'Reached venue',time:null},{label:'Shoot started',time:null},{label:'Shoot completed',time:null}],
-  cards:[],logs:[],raw:'—',
-  deliverables:[{e:'📸',name:'Edited Photos',detail:'',status:'Pending'},{e:'🎞️',name:'Teaser',detail:'',status:'Pending'},{e:'✨',name:'Highlight Film',detail:'',status:'Pending'},{e:'🎬',name:'Full Film',detail:'',status:'Pending'}]},
- {id:'p3',bride:'Sana Mehta',groom:'Karthik Iyer',phone:'919811223344',email:'sana.m@gmail.com',city:'Jaipur',venue:'Rambagh Palace',dates:'11–13 Jun 2026',status:'Shooting',pkg:680000,stage:2,
-  payments:[{label:'Advance',amount:250000,date:'10 Jan 2026',paid:true},{label:'2nd Installment',amount:150000,date:'01 Jun 2026',paid:true},{label:'Final Payment',amount:280000,date:'On delivery',paid:false}],
-  expenses:[{e:'✈️',label:'Travel — team to Jaipur',amount:62000,cat:'Travel'},{e:'🏨',label:'Hotel — 4 nights',amount:58000,cat:'Travel'},{e:'🎥',label:'Imran (drone) 3 days',amount:45000,cat:'Freelancers'}],
-  events:[{name:'💚 Mehendi',date:'2026-06-11',time:'4:00 PM',report:'2:00 PM',venue:'Mughal Garden',shot:true},{name:'💃 Sangeet',date:'2026-06-12',time:'7:00 PM',report:'4:30 PM',venue:'Rambagh Lawns',shot:false},{name:'❤️ Wedding',date:'2026-06-13',time:'8:00 PM',report:'5:00 PM',venue:'Rambagh Palace',shot:false}],
-  team:[{name:'Arjun Rathod',role:'Lead Photographer',note:'All events',status:'Confirmed'},{name:'Kunal Shah',role:'Cinematographer',note:'All events',status:'Confirmed'},{name:'Imran Qureshi',role:'Drone Op (freelance)',note:'₹15,000/day',status:'Confirmed'},{name:'Meera Joshi',role:'Editor (freelance)',note:'Teaser',status:'Editing'}],
-  checkins:[{label:'Reached venue',time:'3:48 PM'},{label:'Shoot started',time:'6:42 PM'},{label:'Shoot completed',time:null}],
-  cards:[{name:'CFexpress 512GB — #C02',detail:'Cinema · in field',status:'In field'}],logs:[{by:'Kunal S.',detail:'11 Jun · day-1 offload · checksum passed'}],raw:'0.9 TB so far',
-  deliverables:[{e:'📸',name:'Edited Photos',detail:'',status:'Pending'},{e:'🎞️',name:'Teaser',detail:'Due 13 Jun',status:'In progress'},{e:'✨',name:'Highlight Film',detail:'',status:'Pending'},{e:'🎬',name:'Full Film',detail:'',status:'Pending'}]},
- {id:'p4',bride:'Ishita Rao',groom:'Siddharth Verma',phone:'919900112233',email:'ishita.r@gmail.com',city:'Bengaluru',venue:'Leela Palace',dates:'Shot Feb 2026',status:'Delivery',pkg:380000,stage:8,
-  payments:[{label:'Advance',amount:150000,date:'01 Dec 2025',paid:true},{label:'2nd Installment',amount:155000,date:'20 Feb 2026',paid:true},{label:'Final Payment',amount:75000,date:'18 Jun 2026',paid:false}],
-  expenses:[{e:'✈️',label:'Travel & stay',amount:71000,cat:'Travel'},{e:'🎥',label:'Freelancers',amount:38000,cat:'Freelancers'},{e:'🔧',label:'Rentals',amount:12000,cat:'Equipment'}],
-  events:[{name:'❤️ Wedding',date:'2026-02-14',time:'7:00 PM',report:'4:00 PM',venue:'Leela Palace',shot:true}],
-  team:[{name:'Priya Menon',role:'Photographer',note:'',status:'Done'},{name:'Rohit Nair',role:'Editor',note:'Album + full film',status:'Editing'}],
-  checkins:[{label:'Reached venue',time:'3:30 PM'},{label:'Shoot started',time:'6:10 PM'},{label:'Shoot completed',time:'1:45 AM'}],
-  cards:[],logs:[{by:'Priya M.',detail:'15 Feb · verified'}],raw:'1.1 TB',
-  deliverables:[{e:'📸',name:'Edited Photos (550)',detail:'',status:'Delivered'},{e:'🎞️',name:'Teaser',detail:'',status:'Delivered'},{e:'✨',name:'Highlight Film',detail:'',status:'Delivered'},{e:'🎬',name:'Full Film',detail:'Due 18 Jun',status:'In progress'},{e:'📖',name:'Album',detail:'Due 18 Jun',status:'In progress'}]},
- {id:'p5',bride:'Riya Khanna',groom:'Veer Khanna',phone:'919855667788',email:'riya.k@gmail.com',city:'Lonavala',venue:'Della Resorts',dates:'27 Jun 2026',status:'Upcoming',pkg:90000,stage:1,
-  payments:[{label:'Advance',amount:45000,date:'20 May 2026',paid:true},{label:'Final Payment',amount:45000,date:'On delivery',paid:false}],
-  expenses:[],events:[{name:'💞 Pre-Wedding Shoot',date:'2026-06-27',time:'6:00 AM',report:'5:00 AM',venue:'Della Resorts',shot:false}],
-  team:[{name:'Arjun Rathod',role:'Photographer',note:'',status:'Confirmed'},{name:'Vedant Desai',role:'Drone Pilot',note:'',status:'Confirmed'}],
-  checkins:[{label:'Reached venue',time:null},{label:'Shoot started',time:null},{label:'Shoot completed',time:null}],
-  cards:[],logs:[],raw:'—',
-  deliverables:[{e:'📸',name:'Edited Photos (80)',detail:'',status:'Pending'},{e:'🎞️',name:'Cinematic Teaser',detail:'',status:'Pending'}]}
-],
-members:[
- {name:'Arjun Rathod',role:'Lead Photographer',exp:'8 yrs',city:'Mumbai',phone:'919812345001'},
- {name:'Kunal Shah',role:'Cinematographer',exp:'6 yrs',city:'Mumbai',phone:'919812345002'},
- {name:'Priya Menon',role:'Photographer',exp:'4 yrs',city:'Pune',phone:'919812345003'},
- {name:'Rohit Nair',role:'Editor',exp:'7 yrs',city:'Remote',phone:'919812345004'},
- {name:'Neha Tiwari',role:'Photographer',exp:'3 yrs',city:'Mumbai',phone:'919812345005'},
- {name:'Vedant Desai',role:'Drone Pilot',exp:'5 yrs',city:'Ahmedabad',phone:'919812345006'},
- {name:'Kavya Pillai',role:'Project Manager',exp:'5 yrs',city:'Mumbai',phone:'919812345007'}
-],
-freelancers:[
- {id:'f1',name:'Imran Qureshi',role:'Drone Op',rate:15000,gear:'DJI Inspire 3 (own)',due:30000,paid:290000,shoots:22,upcoming:2},
- {id:'f2',name:'Sara Fernandes',role:'2nd Photographer',rate:8000,gear:'Sony A7IV (own)',due:16000,paid:124000,shoots:17,upcoming:1},
- {id:'f3',name:'Dev Kohli',role:'Gimbal Op',rate:10000,gear:'Ronin 4D',due:40500,paid:98000,shoots:11,upcoming:1},
- {id:'f4',name:'Meera Joshi',role:'Freelance Editor',rate:2500,gear:'—',due:0,paid:62500,shoots:25,upcoming:1}
-],
-drives:[
- {name:'WD Gold 8TB — “UDAIPUR-01”',cap:8,used:6.5,note:'3 projects · Shelf A-3 · Health ✓',tier:'main'},
- {name:'Seagate Ironwolf 8TB — “BKP-12”',cap:8,used:5.1,note:'Backup tier · Off-site locker',tier:'backup'},
- {name:'Samsung T7 4TB — “EDIT-SSD-2”',cap:4,used:3.84,note:'With Rohit (editor) · clear after delivery',tier:'edit'},
- {name:'LaCie Rugged 5TB — “FIELD-3”',cap:5,used:2.2,note:'Field offload drive',tier:'main'},
- {name:'WD Elements 12TB — “ARCHIVE-7”',cap:12,used:10.9,note:'2024–25 archive',tier:'archive'},
- {name:'WD Elements 12TB — “ARCHIVE-8”',cap:12,used:11.2,note:'2025–26 archive',tier:'archive'},
- {name:'Crucial X9 2TB — “EDIT-SSD-1”',cap:2,used:1.4,note:'With Meera (fl editor)',tier:'edit'},
- {name:'Seagate 4TB — “BKP-09”',cap:4,used:1.05,note:'Backup tier',tier:'backup'}
-],
-mcards:[
- {name:'CFexpress 512GB — #C02',detail:'Assigned: Mehta ✕ Iyer (live)',status:'In field'},
- {name:'Sony Tough 128GB — #C04',detail:'Free · formatted',status:'Available'},
- {name:'Sandisk 256GB — #C11',detail:'⚠ DO NOT FORMAT — Ananya ✕ Rohan raw not archived',status:'Hold'},
- {name:'Sony Tough 128GB — #C05',detail:'Free · formatted',status:'Available'},
- {name:'CFexpress 256GB — #C07',detail:'Free · formatted',status:'Available'}
-],
-tasks:[
- {id:'t1',title:'Cull photos — Sharma Haldi prep',proj:'Sharma ✕ Kapoor',owner:'Priya',due:'2026-06-15',col:'todo'},
- {id:'t2',title:'Order album sheets',proj:'Rao ✕ Verma',owner:'Kavya',due:'2026-06-12',col:'todo'},
- {id:'t3',title:'Book Lonavala hotel',proj:'Khanna pre-wed',owner:'Ops',due:'2026-06-14',col:'todo'},
- {id:'t4',title:'Color grade highlight film',proj:'Ananya ✕ Rohan',owner:'Rohit',due:'2026-06-19',col:'prog'},
- {id:'t5',title:'Edit teaser',proj:'Mehta ✕ Iyer',owner:'Meera (fl)',due:'2026-06-12',col:'prog'},
- {id:'t6',title:'Client preview — 3 reels',proj:'Rao ✕ Verma',owner:'Kavya',due:'2026-06-16',col:'review'},
- {id:'t7',title:'Deliver 600 edited photos',proj:'Ananya ✕ Rohan',owner:'Rohit',due:'2026-05-26',col:'done'},
- {id:'t8',title:'Backup verification day 1',proj:'Mehta ✕ Iyer',owner:'Kunal',due:'2026-06-11',col:'done'}
-],
-notifs:[
- {icon:'i-alert',cls:'red',title:'Payment overdue — Sharma ✕ Kapoor',sub:'₹1,00,000 · 2nd installment late',time:'2h',read:false},
- {icon:'i-clock',cls:'amber',title:'Teaser deadline today',sub:'Mehta ✕ Iyer · Meera editing',time:'4h',read:false},
- {icon:'i-hdd',cls:'teal',title:'Storage past 75%',sub:'Forecast full by Aug · order drives',time:'1d',read:false},
- {icon:'i-check',cls:'green',title:'Team checked in at Rambagh Palace',sub:'Geo-verified · 3:48 PM',time:'1d',read:true},
- {icon:'i-user',cls:'violet',title:'Freelancer payout pending — Imran',sub:'₹30,000 · 12 days since shoot',time:'2d',read:false}
-],
-revHist:[{m:'Jan',v:3.2},{m:'Feb',v:3.9},{m:'Mar',v:2.9},{m:'Apr',v:4.9},{m:'May',v:5.6},{m:'Jun',v:6.4}]
+projects:[],
+members:[],
+freelancers:[],
+drives:[],
+mcards:[],
+tasks:[],
+notifs:[],
+revHist:[]
 };
 let S;
 try{S=JSON.parse(localStorage.getItem(KEY))||null}catch(e){S=null}
 if(!S||!S.projects)S=JSON.parse(JSON.stringify(DEFAULT));
 if(!S.agency)S.agency=JSON.parse(JSON.stringify(DEFAULT.agency));
 if(!S.users)S.users=JSON.parse(JSON.stringify(DEFAULT.users));
-if(!S._v8){if(!S.users.some(u=>u.id==='u8'))S.users.push({id:'u8',name:'Ananya & Rohan',role:'Client',pin:'0000',projId:'p1'});S._v8=1}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncToSheets();}
 function syncToSheets(){
   const url=(S.agency&&S.agency.sheetsUrl)||'';if(!url)return;
@@ -444,7 +352,7 @@ function syncToSheets(){
       (p.venue||p.city)+', '+p.city,who,tok,p.pkg,pend,p.status,invStatus];
   });
   const payload={agency:S.agency.name,rows};
-  fetch(url,{method:'POST',body:JSON.stringify(payload)}).catch(()=>{});
+  fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(()=>{});
 }
 /* ================= HELPERS ================= */
 const $=id=>document.getElementById(id);
