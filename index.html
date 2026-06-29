@@ -336,7 +336,7 @@ if(!S||!S.projects)S=JSON.parse(JSON.stringify(DEFAULT));
 if(!S.agency)S.agency=JSON.parse(JSON.stringify(DEFAULT.agency));
 if(!S.users)S.users=JSON.parse(JSON.stringify(DEFAULT.users));
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncToSheets();}
-function syncToSheets(){
+function syncToSheets(notify){
   const url=(S.agency&&S.agency.sheetsUrl)||'';if(!url)return;
   const rows=S.projects.map((p,i)=>{
     const rec=p.payments.filter(x=>x.paid).reduce((a,x)=>a+x.amount,0);
@@ -352,8 +352,12 @@ function syncToSheets(){
       (p.venue||p.city)+', '+p.city,who,tok,p.pkg,pend,p.status,invStatus];
   });
   const payload={agency:S.agency.name,rows};
-  fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)}).catch(()=>{});
+  if(notify)toast('Syncing to Google Sheets…');
+  fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)})
+    .then(()=>{if(notify)toast('✅ Google Sheet updated — '+rows.length+' booking'+(rows.length!==1?'s':''))})
+    .catch(e=>{if(notify)toast('❌ Sync failed — check the Script URL in Settings')});
 }
+function testSheetSync(){syncToSheets(true)}
 /* ================= HELPERS ================= */
 const $=id=>document.getElementById(id);
 const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
@@ -999,7 +1003,8 @@ settings(){
     <div class="fld"><label>Email</label><input id="s_email" type="email" value="${esc(a.email||'')}"></div>
     <div class="fld"><label>Address / city</label><input id="s_addr" value="${esc(a.address||'')}"></div>
     <div class="fld"><label>UPI ID (printed on invoices)</label><input id="s_upi" value="${esc(a.upi||'')}"></div>
-    <div class="fld"><label>📊 Google Sheets Script URL <small class="muted">(auto-syncs bookings on every save)</small></label><input id="s_sheets" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(a.sheetsUrl||'')}"></div>
+    <div class="fld"><label>📊 Google Sheets Script URL <small class="muted">(auto-syncs on every project save)</small></label><input id="s_sheets" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(a.sheetsUrl||'')}"></div>
+    ${a.sheetsUrl?`<button class="btn ghost" style="margin-bottom:10px" onclick="testSheetSync()">🔄 Test Sync Now</button>`:''}
     <button class="btn primary" onclick="saveSettings()">Save settings</button>
   </div>
   `:''}
