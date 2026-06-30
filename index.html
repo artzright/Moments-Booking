@@ -318,7 +318,7 @@ svg{flex-shrink:0}
 const KEY='shaadios-v3';
 const DEFAULT={
 theme:'light',
-agency:{name:'Your Agency Name',short:'Agency',owner:'',tagline:'Wedding Films & Photography',phone:'',email:'',address:'',upi:'',logo:null,sheetsUrl:''},
+agency:{name:'Your Agency Name',short:'Agency',owner:'',tagline:'Wedding Films & Photography',phone:'',email:'',address:'',upi:'',logo:null,sheetsUrl:'https://script.google.com/macros/s/AKfycbxm4OHvypJ5bUQjYqvLRaxW9NvIo5Saq9nEHIo8M9tSjgbIZ3uwRni2KWa0KwPQaDMh5g/exec',supabaseUrl:'https://vgversjgafdcagvzvihp.supabase.co',supabaseKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZndmVyc2pnYWZkY2Fndnp2aWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjczODUsImV4cCI6MjA5ODQwMzM4NX0.a4evlI_xlAWMlWmkdymCqw_fE_BZGO6MqsZDzsolhU0'},
 users:[
  {id:'u1',name:'Admin',role:'Super Admin',pin:'1234'}
 ],
@@ -336,7 +336,33 @@ try{S=JSON.parse(localStorage.getItem(KEY))||null}catch(e){S=null}
 if(!S||!S.projects)S=JSON.parse(JSON.stringify(DEFAULT));
 if(!S.agency)S.agency=JSON.parse(JSON.stringify(DEFAULT.agency));
 if(!S.users)S.users=JSON.parse(JSON.stringify(DEFAULT.users));
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncToSheets();}
+/* Auto-inject credentials so no manual entry needed */
+if(!S.agency.sheetsUrl)S.agency.sheetsUrl='https://script.google.com/macros/s/AKfycbxm4OHvypJ5bUQjYqvLRaxW9NvIo5Saq9nEHIo8M9tSjgbIZ3uwRni2KWa0KwPQaDMh5g/exec';
+if(!S.agency.supabaseUrl)S.agency.supabaseUrl='https://vgversjgafdcagvzvihp.supabase.co';
+if(!S.agency.supabaseKey)S.agency.supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZndmVyc2pnYWZkY2Fndnp2aWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjczODUsImV4cCI6MjA5ODQwMzM4NX0.a4evlI_xlAWMlWmkdymCqw_fE_BZGO6MqsZDzsolhU0';
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncToSheets();syncToSupabase();}
+function syncToSupabase(){
+  const a=S.agency||{};if(!a.supabaseUrl||!a.supabaseKey)return;
+  fetch(a.supabaseUrl+'/rest/v1/shaadios',{
+    method:'POST',
+    headers:{'apikey':a.supabaseKey,'Authorization':'Bearer '+a.supabaseKey,
+             'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+    body:JSON.stringify({id:'main',payload:JSON.stringify(S),updated_at:new Date().toISOString()})
+  }).catch(()=>{});}
+async function loadFromSupabase(notify){
+  const a=S.agency||{};if(!a.supabaseUrl||!a.supabaseKey)return;
+  if(notify)toast('☁️ Pulling latest data…');
+  try{
+    const r=await fetch(a.supabaseUrl+'/rest/v1/shaadios?id=eq.main&select=payload',{
+      headers:{'apikey':a.supabaseKey,'Authorization':'Bearer '+a.supabaseKey}});
+    const rows=await r.json();
+    if(rows&&rows.length&&rows[0].payload){
+      const remote=JSON.parse(rows[0].payload);
+      const sess=sessionId;S=remote;sessionId=sess;
+      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      applyTheme();render();
+      if(notify)toast('☁️ Data synced from cloud ✓');}
+  }catch(e){if(notify)toast('☁️ Cloud sync failed — check credentials');}}
 function syncToSheets(notify){
   try{
     const url=(S.agency&&S.agency.sheetsUrl)||'';if(!url)return;
@@ -353,13 +379,13 @@ function syncToSheets(notify){
       return [i+1,p.dates,p.bride+' & '+p.groom,svc,evCount+' day'+(evCount>1?'s':''),
         (p.venue||p.city)+', '+p.city,who,tok,p.pkg,pend,p.status,invStatus];
     });
-    const payload=JSON.stringify({agency:S.agency.name,rows});
-    const f=document.createElement('form');
-    f.method='POST';f.action=url;f.target='gsync_frame';f.style.display='none';
-    const inp=document.createElement('input');inp.type='hidden';inp.name='data';inp.value=payload;
-    f.appendChild(inp);document.body.appendChild(f);f.submit();document.body.removeChild(f);
-    if(notify)toast('✅ Synced — '+rows.length+' booking'+(rows.length!==1?'s':'')+'sent to Google Sheets');
-  }catch(e){if(notify)toast('❌ Sync error — check Settings');}
+    const payload=encodeURIComponent(JSON.stringify({agency:S.agency.name,rows}));
+    if(notify)toast('Syncing to Google Sheets…');
+    fetch(url+'?data='+payload)
+      .then(r=>r.text())
+      .then(t=>{if(notify)toast('✅ Sheet updated — '+rows.length+' booking'+(rows.length!==1?'s':'')+' synced');})
+      .catch(()=>{if(notify)toast('❌ Sync failed — check Script URL in Settings');});
+  }catch(e){if(notify)toast('❌ Sync error');}
 }
 function testSheetSync(){syncToSheets(true)}
 /* ================= HELPERS ================= */
@@ -1011,6 +1037,17 @@ settings(){
     ${a.sheetsUrl?`<button class="btn ghost" style="margin-bottom:10px" onclick="testSheetSync()">🔄 Test Sync Now</button>`:''}
     <button class="btn primary" onclick="saveSettings()">Save settings</button>
   </div>
+  <div class="sectionhead"><h2>☁️ Cloud Sync (Supabase)</h2></div>
+  <div class="card" style="margin-bottom:14px">
+    <p class="muted" style="margin:0 0 12px">All team members share the same data — any change on one device appears on all others. Enter once on every new device.</p>
+    <div class="fld"><label>Supabase Project URL</label><input id="s_sburl" placeholder="https://xxxx.supabase.co" value="${esc(a.supabaseUrl||'')}"></div>
+    <div class="fld"><label>Supabase Anon Key</label><input id="s_sbkey" placeholder="eyJhbGciOiJ..." value="${esc(a.supabaseKey||'')}"></div>
+    <div class="row" style="gap:10px;margin-top:4px">
+      <button class="btn primary" onclick="saveSettings()">Save &amp; Connect</button>
+      ${a.supabaseUrl?`<button class="btn ghost" onclick="loadFromSupabase(true)">↓ Pull latest</button>`:''}
+    </div>
+    ${a.supabaseUrl?`<p class="muted" style="margin-top:8px;color:var(--success)">☁️ Cloud sync active</p>`:'<p class="muted" style="margin-top:8px">Not connected yet</p>'}
+  </div>
   `:''}
   ${can('backup')?`
   <div class="sectionhead"><h2>Data Backup</h2></div>
@@ -1332,7 +1369,10 @@ function saveSettings(){const g=id=>$(id).value.trim();const a=S.agency;
   a.name=g('s_name')||a.name;a.short=g('s_short')||a.short;a.owner=g('s_owner');a.tagline=g('s_tag');
   a.phone=g('s_phone').replace(/[^\d]/g,'');a.email=g('s_email');a.address=g('s_addr');a.upi=g('s_upi');
   a.sheetsUrl=g('s_sheets');
-  save();render();toast('Settings saved — brand applied everywhere ✓')}
+  a.supabaseUrl=g('s_sburl').replace(/\/$/,'');a.supabaseKey=g('s_sbkey');
+  save();render();
+  if(a.supabaseUrl&&a.supabaseKey)setTimeout(()=>loadFromSupabase(true),400);
+  else toast('Settings saved ✓');}
 function backupJSON(){const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='shaadios-backup-'+todayISO()+'.json';a.click();URL.revokeObjectURL(a.href);toast('Backup downloaded ✓')}
 function importJSON(input){const f=input.files[0];if(!f)return;const r=new FileReader();
   r.onload=e=>{try{const d=JSON.parse(e.target.result);if(!d.projects||!d.members)throw 0;S=d;if(!S.agency)S.agency=JSON.parse(JSON.stringify(DEFAULT.agency));save();applyTheme();render();toast('Backup restored ✓')}catch(err){toast('Invalid backup file')}};
@@ -1351,6 +1391,7 @@ function invoice(pid){const p=S.projects.find(x=>x.id===pid);const a=S.agency;co
   <p class="muted">Generated by ShaadiOS for ${a.name}. Thank you for celebrating with us! 💗</p>
   <script>window.print()<\/script></body></html>`);w.document.close()}
 applyTheme();render();
+if(S.agency&&S.agency.supabaseUrl&&S.agency.supabaseKey)setTimeout(()=>loadFromSupabase(false),800);
 </script>
 </body>
 </html>
