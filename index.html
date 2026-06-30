@@ -341,6 +341,11 @@ if(!S.agency.sheetsUrl)S.agency.sheetsUrl='https://script.google.com/macros/s/AK
 function save(){S._savedAt=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncToSheets();syncToSupabase();}
 function syncToSupabase(){
   const a=S.agency||{};if(!a.supabaseUrl||!a.supabaseKey)return;
+  /* Role-based push control */
+  const user=cu();
+  const role=user?user.role:'';
+  const noPush=['Freelancer','Client'];
+  if(noPush.includes(role))return; /* Freelancers & clients never push */
   fetch(a.supabaseUrl+'/rest/v1/shaadios',{
     method:'POST',
     headers:{'apikey':a.supabaseKey,'Authorization':'Bearer '+a.supabaseKey,
