@@ -340,7 +340,7 @@ if(!S.users)S.users=JSON.parse(JSON.stringify(DEFAULT.users));
 if(!S.agency.sheetsUrl)S.agency.sheetsUrl='https://script.google.com/macros/s/AKfycbxm4OHvypJ5bUQjYqvLRaxW9NvIo5Saq9nEHIo8M9tSjgbIZ3uwRni2KWa0KwPQaDMh5g/exec';
 if(!S.agency.supabaseUrl)S.agency.supabaseUrl='https://vgversjgafdcagvzvihp.supabase.co';
 if(!S.agency.supabaseKey)S.agency.supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZndmVyc2pnYWZkY2Fndnp2aWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjczODUsImV4cCI6MjA5ODQwMzM4NX0.a4evlI_xlAWMlWmkdymCqw_fE_BZGO6MqsZDzsolhU0';
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncToSheets();syncToSupabase();}
+function save(){S._savedAt=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncToSheets();syncToSupabase();}
 function syncToSupabase(){
   const a=S.agency||{};if(!a.supabaseUrl||!a.supabaseKey)return;
   fetch(a.supabaseUrl+'/rest/v1/shaadios',{
@@ -353,15 +353,23 @@ async function loadFromSupabase(notify){
   const a=S.agency||{};if(!a.supabaseUrl||!a.supabaseKey)return;
   if(notify)toast('☁️ Pulling latest data…');
   try{
-    const r=await fetch(a.supabaseUrl+'/rest/v1/shaadios?id=eq.main&select=payload',{
+    const r=await fetch(a.supabaseUrl+'/rest/v1/shaadios?id=eq.main&select=payload,updated_at',{
       headers:{'apikey':a.supabaseKey,'Authorization':'Bearer '+a.supabaseKey}});
     const rows=await r.json();
     if(rows&&rows.length&&rows[0].payload){
       const remote=JSON.parse(rows[0].payload);
-      const sess=sessionId;S=remote;sessionId=sess;
-      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
-      applyTheme();render();
-      if(notify)toast('☁️ Data synced from cloud ✓');}
+      const remoteTime=new Date(rows[0].updated_at||0).getTime();
+      const localTime=new Date(S._savedAt||0).getTime();
+      /* Only overwrite if cloud data is newer than what we last saved locally */
+      if(notify||remoteTime>localTime){
+        const sess=sessionId;S=remote;sessionId=sess;
+        try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+        applyTheme();render();
+        if(notify)toast('☁️ Data synced from cloud ✓');
+      }else{
+        if(notify)toast('☁️ Already up to date');
+      }
+    }
   }catch(e){if(notify)toast('☁️ Cloud sync failed — check credentials');}}
 function syncToSheets(notify){
   try{
