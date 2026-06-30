@@ -318,7 +318,7 @@ svg{flex-shrink:0}
 const KEY='shaadios-v3';
 const DEFAULT={
 theme:'light',
-agency:{name:'Your Agency Name',short:'Agency',owner:'',tagline:'Wedding Films & Photography',phone:'',email:'',address:'',upi:'',logo:null,sheetsUrl:'https://script.google.com/macros/s/AKfycbxm4OHvypJ5bUQjYqvLRaxW9NvIo5Saq9nEHIo8M9tSjgbIZ3uwRni2KWa0KwPQaDMh5g/exec',supabaseUrl:'https://vgversjgafdcagvzvihp.supabase.co',supabaseKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZndmVyc2pnYWZkY2Fndnp2aWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjczODUsImV4cCI6MjA5ODQwMzM4NX0.a4evlI_xlAWMlWmkdymCqw_fE_BZGO6MqsZDzsolhU0'},
+agency:{name:'Your Agency Name',short:'Agency',owner:'',tagline:'Wedding Films & Photography',phone:'',email:'',address:'',upi:'',logo:null,sheetsUrl:'https://script.google.com/macros/s/AKfycbxm4OHvypJ5bUQjYqvLRaxW9NvIo5Saq9nEHIo8M9tSjgbIZ3uwRni2KWa0KwPQaDMh5g/exec',supabaseUrl:'',supabaseKey:''},
 users:[
  {id:'u1',name:'Admin',role:'Super Admin',pin:'1234'}
 ],
@@ -336,10 +336,8 @@ try{S=JSON.parse(localStorage.getItem(KEY))||null}catch(e){S=null}
 if(!S||!S.projects)S=JSON.parse(JSON.stringify(DEFAULT));
 if(!S.agency)S.agency=JSON.parse(JSON.stringify(DEFAULT.agency));
 if(!S.users)S.users=JSON.parse(JSON.stringify(DEFAULT.users));
-/* Auto-inject credentials so no manual entry needed */
+/* Auto-inject Sheets URL (not sensitive — no auth key) */
 if(!S.agency.sheetsUrl)S.agency.sheetsUrl='https://script.google.com/macros/s/AKfycbxm4OHvypJ5bUQjYqvLRaxW9NvIo5Saq9nEHIo8M9tSjgbIZ3uwRni2KWa0KwPQaDMh5g/exec';
-if(!S.agency.supabaseUrl)S.agency.supabaseUrl='https://vgversjgafdcagvzvihp.supabase.co';
-if(!S.agency.supabaseKey)S.agency.supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZndmVyc2pnYWZkY2Fndnp2aWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjczODUsImV4cCI6MjA5ODQwMzM4NX0.a4evlI_xlAWMlWmkdymCqw_fE_BZGO6MqsZDzsolhU0';
 function save(){S._savedAt=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncToSheets();syncToSupabase();}
 function syncToSupabase(){
   const a=S.agency||{};if(!a.supabaseUrl||!a.supabaseKey)return;
@@ -348,7 +346,9 @@ function syncToSupabase(){
     headers:{'apikey':a.supabaseKey,'Authorization':'Bearer '+a.supabaseKey,
              'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
     body:JSON.stringify({id:'main',payload:JSON.stringify(S),updated_at:new Date().toISOString()})
-  }).catch(()=>{});}
+  }).then(r=>{
+    if(!r.ok)r.text().then(t=>toast('☁️ Sync error: '+r.status+' '+t.slice(0,60)));
+  }).catch(e=>toast('☁️ Sync failed: '+e.message));}
 async function loadFromSupabase(notify){
   const a=S.agency||{};if(!a.supabaseUrl||!a.supabaseKey)return;
   if(notify)toast('☁️ Pulling latest data…');
